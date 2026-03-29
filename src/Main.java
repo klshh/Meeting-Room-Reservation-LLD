@@ -21,11 +21,11 @@ public class Main {
         meetingRoomReservation.bookRoom(1L,1L,LocalDateTime.of(2026,3,29,12,0),LocalDateTime.of(
                 2026, 3,29,12,30));
 
-        meetingRoomReservation.bookRoom(2L,2L,LocalDateTime.of(2025,11,30,10,0),
-                LocalDateTime.of(2025,11,30,11,0));
+        meetingRoomReservation.bookRoom(2L,2L,LocalDateTime.of(2026,3,29,12,0),
+                LocalDateTime.of(2026,3,29,13,59));
 
-        Interval newInterval = new Interval(LocalDateTime.of(2025,11,30,10,0),
-                LocalDateTime.of(2025,11,30,11,0));
+        Interval newInterval = new Interval(LocalDateTime.of(2026,3,29,12,0),
+                LocalDateTime.of(2026,3,29,13,0));
 
         List<MeetingRoom> getAvailableRoomsAfterBooking = meetingRoomReservation.getAvailableRooms(newInterval);
 

@@ -35,4 +35,9 @@ public class MeetingRoom {
     public void setRoomBookingList(List<Booking> roomBookingList) {
         this.roomBookingList = roomBookingList;
     }
+
+    @Override
+    public String toString() {
+        return "MeetingRoom{roomId=" + roomId + "}";
+    }
 }

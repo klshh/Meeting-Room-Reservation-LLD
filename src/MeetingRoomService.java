@@ -18,8 +18,8 @@ public class MeetingRoomService {
         MeetingRoom meetingRoom = getMeetingRoomById(roomId);
 
         Optional<Interval> interval = meetingRoom.getTimeSlotBookedList().stream().filter(interval1 -> {
-            return interval1.getStartTime().equals(requestedInterval.getStartTime()) &&
-                    interval1.getEndTime().equals(requestedInterval.getEndTime());
+            return interval1.getStartTime().isBefore(requestedInterval.getEndTime()) &&
+                    interval1.getEndTime().isAfter(requestedInterval.getStartTime());
 
         }).findFirst();
 
@@ -44,8 +44,8 @@ public class MeetingRoomService {
     public List<MeetingRoom> getAvailableRooms(Interval interval) {
         Set<Map.Entry<Long, MeetingRoom>> meetingRooms = meetingRoomList.entrySet().stream().filter(roomEntry-> {
 
-            Optional<Interval> intervalMatch = roomEntry.getValue().getTimeSlotBookedList().stream().filter(roomInterval -> roomInterval.getStartTime().equals(interval.getStartTime())
-                    && roomInterval.getEndTime().equals(interval.getEndTime())).findFirst();
+            Optional<Interval> intervalMatch = roomEntry.getValue().getTimeSlotBookedList().stream().filter(roomInterval -> roomInterval.getStartTime().isBefore(interval.getEndTime())
+                    && roomInterval.getEndTime().isAfter(interval.getStartTime())).findFirst();
             return intervalMatch.isEmpty();
         }).collect(Collectors.toSet());
 

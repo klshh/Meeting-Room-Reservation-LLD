@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Employee {
@@ -14,15 +15,10 @@ public class Employee {
 
     private List<Booking> bookingList;
 
-    public Employee(Long employeeId, String employeeName, List<Booking> bookingList) {
-        this.employeeId = employeeId;
-        this.employeeName = employeeName;
-        this.bookingList = bookingList;
-    }
-
     public Employee(Long employeeId, String employeeName) {
         this.employeeId = employeeId;
         this.employeeName = employeeName;
+        this.bookingList = new ArrayList<>();
     }
 
     public Long getEmployeeId() {

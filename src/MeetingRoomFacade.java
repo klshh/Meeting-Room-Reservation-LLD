@@ -1,6 +1,9 @@
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MeetingRoomFacade {
 //    book a room
@@ -12,6 +15,7 @@ public class MeetingRoomFacade {
     AtomicLong bookingId = new AtomicLong(0);
     EmployeeService employeeService;
     MeetingRoomService meetingRoomService;
+    private final ConcurrentHashMap<Long, Lock> roomLocks = new ConcurrentHashMap<>();
 
     public MeetingRoomFacade(BookingService bookingService, EmployeeService employeeService, MeetingRoomService meetingRoomService) {
         this.bookingService = bookingService;
@@ -23,19 +27,25 @@ public class MeetingRoomFacade {
 
         Interval interval = new Interval(startTime, endTime);
 
-//        check roomStatus
-        boolean roomBookingAvailable = meetingRoomService.getRoomStatusForGivenInterval(roomId, interval);
+        Lock roomLock = roomLocks.computeIfAbsent(roomId, k -> new ReentrantLock());
+        roomLock.lock();
+        try {
+//            check roomStatus
+            boolean roomBookingAvailable = meetingRoomService.getRoomStatusForGivenInterval(roomId, interval);
 
-        if(roomBookingAvailable){
-            Employee employee = employeeService.getEmployeeById(employeeId);
-            MeetingRoom meetingRoom = meetingRoomService.getMeetingRoomById(roomId);
-            Booking booking = new Booking(bookingId.incrementAndGet(), employee, meetingRoom, interval);
+            if (roomBookingAvailable) {
+                Employee employee = employeeService.getEmployeeById(employeeId);
+                MeetingRoom meetingRoom = meetingRoomService.getMeetingRoomById(roomId);
+                Booking booking = new Booking(bookingId.incrementAndGet(), employee, meetingRoom, interval);
 
-            bookingService.addBooking(booking);
-            employeeService.addMeetingForEmployee(employeeId, booking);
-            meetingRoomService.bookedRoomForTimeSlot(roomId, interval, booking);
-        }else {
-            System.out.println(" This room is already booked by someone else for given time interval");
+                bookingService.addBooking(booking);
+                employeeService.addMeetingForEmployee(employeeId, booking);
+                meetingRoomService.bookedRoomForTimeSlot(roomId, interval, booking);
+            } else {
+                System.out.println(" This room is already booked by someone else for given time interval");
+            }
+        } finally {
+            roomLock.unlock();
         }
 
     }
